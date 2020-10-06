@@ -1,0 +1,7 @@
+venv/
+env/
+.env
+db.sqlite
+.idea
+.vscode
+__pycache__/
