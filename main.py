@@ -3,16 +3,24 @@ import logging
 from telegram import Update
 from telegram.error import Unauthorized, TimedOut, NetworkError, ChatMigrated, TelegramError, BadRequest
 from telegram.ext import Updater, ConversationHandler, CommandHandler, MessageHandler, Filters, CallbackQueryHandler, \
-    CallbackContext
+    CallbackContext, BaseFilter
 
 import db
 from config import Config
-from conversation import add_description
+from conversation import add_description, process_album
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
+
+
+class AlbumFilter(BaseFilter):
+    def filter(self, update):
+        return (update.message.photo or update.message.video) and update.message.media_group_id
+
+
+album_filter = AlbumFilter()
 
 
 def get_description(update: Update, context: CallbackContext):
@@ -53,7 +61,8 @@ def error_callback(update: Update, context: CallbackContext):
 def main():
     updater = Updater(token=Config.get('token'), use_context=True)
     private = MessageHandler(Filters.private & Filters.text, get_description)
-    group = MessageHandler(Filters.group & (Filters.photo | Filters.video | Filters.animation), add_description)
+    group = MessageHandler(Filters.group & (Filters.document | Filters.photo | Filters.video | Filters.animation), add_description)
+    updater.dispatcher.add_handler(MessageHandler(album_filter, process_album))
     updater.dispatcher.add_handler(private)
     updater.dispatcher.add_handler(group)
     updater.dispatcher.add_error_handler(error_callback)
