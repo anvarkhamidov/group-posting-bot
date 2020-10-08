@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 
 
 class AlbumFilter(BaseFilter):
-    def filter(self, update):
-        return (update.message.photo or update.message.video) and update.message.media_group_id
+    def filter(self, message):
+        return (message.photo or message.video) and message.media_group_id
 
 
 album_filter = AlbumFilter()
@@ -25,10 +25,13 @@ album_filter = AlbumFilter()
 
 def get_description(update: Update, context: CallbackContext):
     description = db.session.query(db.Description).first()
+
     if not description:
         description = db.Description(text=update.effective_message.text)
         db.session.add(description)
     else:
+        if update.message.text == '/start':
+            return update.message.reply_text(f'Current text: \n{description.text or "empty"}')
         description.text = update.effective_message.text
     db.session.commit()
     update.message.reply_text('Текст изменён.')
