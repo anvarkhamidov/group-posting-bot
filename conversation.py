@@ -1,12 +1,10 @@
 import logging
-import time
 
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ParseMode, ReplyKeyboardRemove, InputMedia, \
-    InputMediaPhoto
-from telegram.ext import CallbackContext, run_async, ConversationHandler
+from telegram import Update, ParseMode
+from telegram.ext import CallbackContext
 
 import db
-from config import Config
+from main import restricted
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -14,6 +12,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 
+@restricted
 def add_description(update: Update, context: CallbackContext):
     if 'media_group_id' not in context.chat_data:  # init default data for media_group_id
         context.chat_data['media_group_id'] = 0
@@ -25,31 +24,31 @@ def add_description(update: Update, context: CallbackContext):
     chat_id = update.effective_chat.id
     caption = db.session.query(db.Description).first() or None
     if message.photo:
-        # context.bot.delete_message(chat_id=chat_id, message_id=message.message_id)
-        if message.media_group_id:
-            if message.media_group_id == context.chat_data['media_group_id']:
-                context.chat_data['media'].append(InputMediaPhoto(media=message.photo[-1].file_id,
-                                                                  caption=caption.text,
-                                                                  parse_mode=ParseMode.HTML))
-            else:
-                if context.chat_data['media_group_id'] != 0:
-                    context.chat_data['ready_to_send'] = True
-                else:
-                    context.chat_data['media'].append(InputMediaPhoto(media=message.photo[-1].file_id,
-                                                                      caption=caption.text,
-                                                                      parse_mode=ParseMode.HTML))
-                context.chat_data['media_group_id'] = message.media_group_id
-
-            print(context.chat_data['media'])
-
-            if context.chat_data['ready_to_send']:
-                context.bot.send_media_group(chat_id=chat_id, media=context.chat_data['media'])
-                del context.chat_data['media']
-        else:
-            context.bot.send_photo(chat_id=chat_id,
-                                   caption=caption.text,
-                                   photo=message.photo[-1].file_id,
-                                   parse_mode=ParseMode.HTML)
+        context.bot.delete_message(chat_id=chat_id, message_id=message.message_id)
+        # if message.media_group_id:
+        #     if message.media_group_id == context.chat_data['media_group_id']:
+        #         context.chat_data['media'].append(InputMediaPhoto(media=message.photo[-1].file_id,
+        #                                                           caption=caption.text,
+        #                                                           parse_mode=ParseMode.HTML))
+        #     else:
+        #         if context.chat_data['media_group_id'] != 0:
+        #             context.chat_data['ready_to_send'] = True
+        #         else:
+        #             context.chat_data['media'].append(InputMediaPhoto(media=message.photo[-1].file_id,
+        #                                                               caption=caption.text,
+        #                                                               parse_mode=ParseMode.HTML))
+        #         context.chat_data['media_group_id'] = message.media_group_id
+        #
+        #     print(context.chat_data['media'])
+        #
+        #     if context.chat_data['ready_to_send']:
+        #         context.bot.send_media_group(chat_id=chat_id, media=context.chat_data['media'])
+        #         del context.chat_data['media']
+        # else:
+        context.bot.send_photo(chat_id=chat_id,
+                               caption=caption.text,
+                               photo=message.photo[-1].file_id,
+                               parse_mode=ParseMode.HTML)
 
     elif message.animation:
         context.bot.delete_message(chat_id=chat_id, message_id=message.message_id)
@@ -74,5 +73,6 @@ def add_description(update: Update, context: CallbackContext):
         return
 
 
+@restricted
 def process_album(update: Update, context: CallbackContext):
     pass

@@ -1,4 +1,5 @@
 import logging
+from functools import wraps
 
 from telegram import Update
 from telegram.error import Unauthorized, TimedOut, NetworkError, ChatMigrated, TelegramError, BadRequest
@@ -14,6 +15,8 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
+ADMINS = [511773656, 819149807]
+
 
 class AlbumFilter(BaseFilter):
     def filter(self, message):
@@ -23,6 +26,18 @@ class AlbumFilter(BaseFilter):
 album_filter = AlbumFilter()
 
 
+def restricted(func):
+    @wraps(func)
+    def wrapped(update, context, *args, **kwargs):
+        user_id = update.effective_user.id
+        if user_id not in ADMINS:
+            logger.warning("Unauthorized access denied for [{}] {}.".format(user_id, update.effective_user.first_name))
+            return
+        return func(update, context, *args, **kwargs)
+    return wrapped
+
+
+@restricted
 def get_description(update: Update, context: CallbackContext):
     description = db.session.query(db.Description).first()
 
