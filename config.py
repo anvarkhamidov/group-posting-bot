@@ -1,7 +1,25 @@
 import os
+import logging
+from functools import wraps
+
 from dotenv import load_dotenv
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
+
+ADMINS = [511773656, 819149807]
+
+
+def restricted(func):
+    @wraps(func)
+    def wrapped(update, context, *args, **kwargs):
+        user_id = update.effective_user.id
+        if user_id not in ADMINS:
+            logger.warning("Unauthorized access denied for [{}] {}.".format(user_id, update.effective_user.first_name))
+            return
+        return func(update, context, *args, **kwargs)
+    return wrapped
 
 
 class Config:

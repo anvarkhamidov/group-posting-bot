@@ -1,21 +1,17 @@
 import logging
-from functools import wraps
 
 from telegram import Update
 from telegram.error import Unauthorized, TimedOut, NetworkError, ChatMigrated, TelegramError, BadRequest
-from telegram.ext import Updater, ConversationHandler, CommandHandler, MessageHandler, Filters, CallbackQueryHandler, \
-    CallbackContext, BaseFilter
+from telegram.ext import Updater, MessageHandler, Filters, CallbackContext, BaseFilter
 
 import db
-from config import Config
+from config import Config, restricted
 from conversation import add_description, process_album
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
-
-ADMINS = [511773656, 819149807]
 
 
 class AlbumFilter(BaseFilter):
@@ -24,17 +20,6 @@ class AlbumFilter(BaseFilter):
 
 
 album_filter = AlbumFilter()
-
-
-def restricted(func):
-    @wraps(func)
-    def wrapped(update, context, *args, **kwargs):
-        user_id = update.effective_user.id
-        if user_id not in ADMINS:
-            logger.warning("Unauthorized access denied for [{}] {}.".format(user_id, update.effective_user.first_name))
-            return
-        return func(update, context, *args, **kwargs)
-    return wrapped
 
 
 @restricted

@@ -4,7 +4,7 @@ from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 
 import db
-from main import restricted
+from config import restricted
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
