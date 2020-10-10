@@ -3,6 +3,7 @@ import logging
 from telegram import Update
 from telegram.error import Unauthorized, TimedOut, NetworkError, ChatMigrated, TelegramError, BadRequest
 from telegram.ext import Updater, MessageHandler, Filters, CallbackContext, BaseFilter
+from telegram.utils.request import Request
 
 import db
 from config import Config, restricted
