@@ -12,7 +12,6 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 
-@restricted
 def add_description(update: Update, context: CallbackContext):
     if 'media_group_id' not in context.chat_data:  # init default data for media_group_id
         context.chat_data['media_group_id'] = 0
