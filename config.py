@@ -8,7 +8,7 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-ADMINS = [511773656, 819149807]
+ADMINS = [511773656, 819149807, 355518558]
 
 
 def restricted(func):
