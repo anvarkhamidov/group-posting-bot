@@ -64,7 +64,7 @@ def error_callback(update: Update, context: CallbackContext):
 
 
 def main():
-    queue = mqbot.mq.MessageQueue(all_burst_limit=10, all_time_limit_ms=1017, group_burst_limit=10, group_time_limit_ms=60000)
+    queue = mqbot.mq.MessageQueue(all_burst_limit=10, all_time_limit_ms=1000, group_burst_limit=5, group_time_limit_ms=60000)
     bot = mqbot.MQBot(token=Config.get('token'), request=Request(con_pool_size=8), mqueue=queue)
     updater = Updater(bot=bot, use_context=True)
     private = MessageHandler(Filters.private & Filters.text, get_description)
