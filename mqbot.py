@@ -1,4 +1,4 @@
-from telegram.ext import messagequeue as mq,
+from telegram.ext import messagequeue as mq
 
 class MQBot(telegram.bot.Bot):
     """A subclass of Bot which delegates send method handling to MQ"""
