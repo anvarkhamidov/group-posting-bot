@@ -8,7 +8,7 @@ from telegram.utils.request import Request
 import db
 from config import Config, restricted
 import mqbot
-from conversation import add_description, process_album
+from conversation import add_description, process_album, send_album
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -64,13 +64,13 @@ def error_callback(update: Update, context: CallbackContext):
 
 
 def main():
-    queue = mqbot.mq.MessageQueue(all_burst_limit=20, all_time_limit_ms=1017, group_burst_limit=20, group_time_limit_ms=60000)
+    queue = mqbot.mq.MessageQueue(all_burst_limit=10, all_time_limit_ms=1017, group_burst_limit=10, group_time_limit_ms=60000)
     bot = mqbot.MQBot(token=Config.get('token'), request=Request(con_pool_size=8), mqueue=queue)
     updater = Updater(bot=bot, use_context=True)
     private = MessageHandler(Filters.private & Filters.text, get_description)
     group = MessageHandler(Filters.group & (Filters.document | Filters.photo | Filters.video | Filters.animation), add_description)
-    updater.dispatcher.add_handler(MessageHandler(album_filter, process_album))
     updater.dispatcher.add_handler(private)
+    updater.dispatcher.add_handler(MessageHandler(album_filter, process_album))
     updater.dispatcher.add_handler(group)
     updater.dispatcher.add_error_handler(error_callback)
     return updater
@@ -79,6 +79,6 @@ def main():
 if __name__ == '__main__':
     Config.validate()
     upd = main()
-    print('Bot started')
+    print(f'{upd.bot.username} started')
     upd.start_polling()
     upd.idle()

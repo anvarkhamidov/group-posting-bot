@@ -34,3 +34,9 @@ class MQBot(telegram.bot.Bot):
         """Wrapped method would accept new `queued` and `isgroup` OPTIONAL arguments"""
         # logger.info("Sending queued message")
         return super(MQBot, self).send_document(*args, **kwargs)
+    
+    @mq.queuedmessage
+    def send_media_group(self, *args, **kwargs):
+        """Wrapped method would accept new `queued` and `isgroup` OPTIONAL arguments"""
+        # logger.info("Sending queued message")
+        return super(MQBot, self).send_media_group(*args, **kwargs)
