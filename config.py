@@ -14,7 +14,10 @@ ADMINS = [511773656, 819149807, 355518558]
 def restricted(func):
     @wraps(func)
     def wrapped(update, context, *args, **kwargs):
-        user_id = update.effective_user.id
+        if update.effective_chat.type == 'supergroup':
+            user_id = update.effective_message.from_user.id
+        else:
+            user_id = update.effective_message.id
         if user_id not in ADMINS:
             logger.warning("Unauthorized access denied for [{}] {}.".format(user_id, update.effective_user.first_name))
             return

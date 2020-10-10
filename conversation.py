@@ -1,7 +1,5 @@
-from collections import OrderedDict
+from config import restricted
 from datetime import datetime
-from telegram import chat
-from telegram.ext.dispatcher import run_async
 from telegram.files.inputmedia import InputMediaPhoto, InputMediaVideo
 import db
 import logging
@@ -13,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 job_checker = None
 
+@restricted
 def add_description(update: Update, context: CallbackContext):
     message = update.effective_message
     chat_id = update.effective_chat.id
@@ -67,6 +66,7 @@ def send_album(context: CallbackContext):
         print(e)
 
 # @run_async
+@restricted
 def process_album(update: Update, context: CallbackContext):
     message: telegram.Message = update.effective_message
     caption = db.session.query(db.Description).first() or None
