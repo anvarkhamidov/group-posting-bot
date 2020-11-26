@@ -17,7 +17,7 @@ def restricted(func):
         if update.effective_chat.type == 'supergroup':
             user_id = update.effective_message.from_user.id
         else:
-            user_id = update.effective_message.id
+            user_id = update.effective_chat.id
         if user_id not in ADMINS:
             logger.warning("Unauthorized access denied for [{}] {}.".format(user_id, update.effective_user.first_name))
             return
